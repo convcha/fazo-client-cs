@@ -14,9 +14,13 @@ namespace fazo_client_cs
 {
     public partial class CaptureWindow
     {
-        public CaptureWindow()
+        private readonly Conf _conf;
+
+        public CaptureWindow(Conf conf)
         {
             InitializeComponent();
+
+            _conf = conf;
 
             Cursor = Cursors.Cross;
             var origin = new Point();
@@ -60,12 +64,7 @@ namespace fazo_client_cs
                 });
         }
 
-        private static Rect BoundsRect(double left, double top, double right, double bottom)
-        {
-            return new Rect(Math.Min(left, right), Math.Min(top, bottom), Math.Abs(right - left), Math.Abs(bottom - top));
-        }
-
-        public static void CaptureScreen(Rect rect)
+        public void CaptureScreen(Rect rect)
         {
             using (var bmp = new Bitmap((int) rect.Width, (int) rect.Height, PixelFormat.Format32bppArgb))
             {
@@ -80,7 +79,7 @@ namespace fazo_client_cs
                         bmp.Save(ms, ImageFormat.Png);
                         var img = ms.GetBuffer();
 
-                        const string url = "http://localhost:9000";
+                        var url = _conf.Host;
                         var userName = Environment.UserName;
 
                         var wc = new WebClient();
@@ -95,6 +94,11 @@ namespace fazo_client_cs
                     }
                 }
             }
+        }
+
+        private static Rect BoundsRect(double left, double top, double right, double bottom)
+        {
+            return new Rect(Math.Min(left, right), Math.Min(top, bottom), Math.Abs(right - left), Math.Abs(bottom - top));
         }
     }
 }
